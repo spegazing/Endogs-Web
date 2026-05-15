@@ -1,0 +1,576 @@
+:root { 
+    --primary-color: #0d6efd; 
+    --success-color: #198754; 
+    --danger-color: #dc3545; 
+    --warning-color: #ffc107; 
+    --info-color: #0dcaf0; 
+    --bg-light: #f8f9fa; 
+    --border-radius-md: 12px; 
+    --border-radius-sm: 6px; 
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05); 
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1); 
+    --transition-speed: 0.3s; 
+} 
+
+/* === 1. 全局基础样式 === */
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+    background-color: var(--bg-light); 
+    color: #333; 
+} 
+
+/* === 2. 卡片与通用组件优化 === */
+.card { 
+    border-radius: 16px !important; 
+    overflow: hidden; 
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); 
+    border: none !important; 
+    transition: all 0.3s ease; 
+} 
+.card:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12); 
+} 
+.card-header { 
+    background: linear-gradient(135deg, #0d6efd 0%, #0d6efd 100%) !important; 
+    color: white !important; 
+    padding: 1.5rem; 
+    border-bottom: none !important; 
+} 
+.card-header h4 { 
+    margin: 0; 
+    font-weight: 700; 
+    letter-spacing: -0.5px; 
+} 
+
+/* 表单控件统一风格 */
+.form-select, .form-control { 
+    border-radius: 10px !important; 
+    border: 1px solid #dee2e6 !important; 
+    padding: 0.5rem !important; 
+    font-size: 0.95rem; 
+    transition: all 0.2s; 
+} 
+.form-select:focus, .form-control:focus { 
+    border-color: #0d6efd !important; 
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15) !important; 
+} 
+
+/* 按钮风格增强 */
+.btn-primary { 
+    background: linear-gradient(to right, #0d6efd, #0b5ed7); 
+} 
+.btn-primary:hover { 
+    background: linear-gradient(to right, #0b5ed7, #0a58ca); 
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3); 
+} 
+
+/* 进度条美化 */
+.progress { 
+    border-radius: 10px !important; 
+    background-color: #f0f0f0 !important; 
+    height: 8px !important; 
+    overflow: hidden; 
+} 
+.progress-bar { 
+    border-radius: 10px !important; 
+    background: linear-gradient(to right, #198754, #157347) !important; 
+    transition: width 0.4s ease !important; 
+} 
+
+/* === 3. 导航与标签页 === */
+
+.nav-pills .nav-link { 
+    color: #6c757d; 
+    border-radius: 20px; 
+    padding: 8px 20px; 
+    font-weight: 500; 
+    transition: all 0.2s; 
+} 
+.nav-pills .nav-link.active { 
+    background-color: var(--primary-color); 
+    box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3); 
+} 
+
+.logo{
+    display: flex;
+    align-items: center; /* 垂直居中对齐 */
+    gap:0.5rem;
+}
+
+.navbar-logo { 
+    height: 60px; 
+    width: auto; 
+} 
+.navbar-brand {
+    /* 字体设置 */
+    font-family: 'CustomFontX', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; /* 指定字体X，后跟备用字体 */
+    font-weight: 660; /* 加粗 */
+    font-size: 2rem; /* 调整大小以适应导航栏 */
+    
+    /* 渐变背景设置 */
+    background-image: linear-gradient(90deg, #ffc0cb 0%, #0790d5 70%); /* 淡粉色 (#ffc0cb) 到 淡蓝色 (#add8e6) */
+    -webkit-background-clip: text; /* 关键：将背景裁剪为文字形状 */
+    -webkit-text-fill-color: transparent; /* 关键：让文字填充颜色透明，显示背景 */
+    background-clip: text;
+    background-size: 200% auto; /* 为了让hover动画更平滑，可以设置背景大小 */
+}
+
+/* === 4. 专业渐变卡片 (Header) === */
+.gradient-card { 
+    background-image: linear-gradient(45deg, #ffffff, #8bc0e6); 
+    background-size: cover; 
+    background-position: center; 
+    margin-top: 0px; 
+    height: 260px; 
+    border-radius: 12px; 
+} 
+.gradient-card .card-body { 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+} 
+.gradient-card .card-title { 
+    color: #141615; 
+    font-size: 4rem; 
+    font-weight: 700; 
+    margin-bottom: 15px !important; 
+} 
+.gradient-card .card-text { 
+    color: #5c5c5c; 
+    font-size: 1rem; 
+    line-height: 1.6; 
+} 
+
+/* === 5. 右侧预览区域 (核心修改：固定 500px) === */
+/* --- 5.1 容器与布局 --- */
+#previewContainer { 
+    width: 100%;
+    height: 520px; 
+    max-height: 520px; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+} 
+
+/* --- 预览区域 --- */
+.preview-wrapper { 
+    background: white; 
+    border-radius: var(--border-radius-md); 
+    padding: 20px; 
+    box-shadow: var(--shadow-sm);  
+} 
+.preview-tabs { 
+    display: flex; 
+    gap: 10px; 
+    border-bottom: 1px solid #eee; 
+    padding-bottom: 10px; 
+    margin-bottom: 20px; 
+} 
+.preview-tab { 
+    background: transparent; 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 20px; 
+    cursor: pointer; 
+    color: #6c757d; 
+    font-weight: 500; 
+    transition: all 0.2s; 
+} 
+.preview-tab:hover { 
+    background: #e9ecef; 
+    color: var(--primary-color); 
+} 
+.preview-tab.active { 
+    background: var(--primary-color); 
+    color: white; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+} 
+
+/* --- 5.2 点云预览专用样式 --- */
+/* 顶部功能控制栏 (悬浮在画面上方) */
+.preview-controls-container { 
+    position: absolute; 
+    display:flex;
+    justify-content: space-between;   /* ⭐关键：左右分开 */
+    align-items: center;              /* ⭐垂直居中 */
+
+    left: 0; 
+    right: 0; 
+    width: 100%; 
+    margin: 0 auto; 
+    z-index: 1000; 
+    background-color: #b1afaf9a; 
+    backdrop-filter: blur(10px); 
+    border: 1px solid rgba(87, 87, 89, 0.644); 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
+    transition: all 0.3s ease; 
+}
+.preview-controls-container .btn-group { 
+    display: inline-flex; 
+    flex-wrap: wrap; 
+    gap: 0; 
+    height: 100%; 
+    width: auto; 
+} 
+.preview-controls-container .btn { 
+    white-space: nowrap; 
+    font-size: 0.875rem; 
+    padding: 0; 
+} 
+.preview-controls-container .dropdown-menu { 
+    margin-top: 2px; 
+} 
+
+.frame-control{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-left:auto; 
+}
+.frame-number {
+    display: inline-block;
+    width: 3ch;           /* 固定为3个字符宽度 */
+    text-align: right;    /* 右对齐，更像数字计数器 */
+    font-family: monospace; /* 使用等宽字体，确保每个数字宽度一致 */
+}
+
+/* 1. 强制点云流容器高度不超过父容器，且内部不溢出 */
+#pointCloudStream {
+    display: flex; 
+    flex-direction: column; 
+    height: 100%; 
+    overflow: hidden; 
+}
+/* 点云画面区域 (固定高度逻辑的核心) */
+
+#pointCloudViewer { 
+    width: 100%; 
+    height: 87%; 
+    background: #ffffff; 
+    border-radius: var(--border-radius-sm); 
+    overflow: hidden; 
+    position: relative; 
+    margin-top: 10px; 
+} 
+
+/* --- 5.3 图像流与通用预览 --- */
+#imageStream {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* 1. 包装器：关键修改在这里 */
+.preview-img-wrapper {
+    position: relative;     
+    display: inline-block;   
+    margin: 2px;            
+    vertical-align: top;     
+    
+  
+    border-radius: 3px;       
+    overflow: hidden;         
+}
+
+/* 3. 编号标签 */
+.frame-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(218, 218, 218, 0.635);
+    color: #363636;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;       /* 标签自身的圆角 */
+    pointer-events: none;     /* 鼠标穿透 */
+    z-index: 10;
+}
+
+.preview-img {
+    width: 180px;
+    height: auto;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    border-radius: var(--border-radius-sm);
+    border: 2px solid white;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: pointer;
+    background: #eee;
+} 
+
+.preview-img:hover { 
+    transform: scale(1.03); 
+    border-color: var(--primary-color); 
+    z-index: 2; 
+} 
+.control-panel { 
+    background: white; 
+    border: 1px solid #eee; 
+} 
+
+/* === 6. 表单与交互组件 === */
+/* 颜色选择器优化 */
+.form-control-color { 
+    width: 100%; 
+    height: auto; 
+    padding: 0.25rem; 
+} 
+.dropdown-menu input[type="color"] { 
+    cursor: pointer; 
+} 
+
+/* 网格按钮激活状态 */
+#gridToggleBtn.active { 
+    background-color: var(--primary-color); 
+    color: white; 
+} 
+
+/* 滑块样式 */
+#frameSlider { 
+    --value: 0%; 
+    height: 6px; 
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) var(--value), #dee2e6 var(--value), #dee2e6 100%); 
+    border-radius: 10px; 
+    outline: none; 
+    -webkit-appearance: none; 
+} 
+#frameSlider::-webkit-slider-thumb { 
+    -webkit-appearance: none; 
+    width: 18px; 
+    height: 18px; 
+    background: white; 
+    border: 2px solid var(--primary-color); 
+    border-radius: 50%; 
+    cursor: pointer; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+    transition: transform 0.1s; 
+} 
+#frameSlider::-webkit-slider-thumb:hover { 
+    transform: scale(1.2); 
+} 
+
+/* === 7. 模态框 (自定义) === */
+.custom-modal { 
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0, 0, 0, 0.85); 
+    z-index: 2000; 
+    backdrop-filter: blur(4px); 
+    overflow-y: auto; 
+} 
+.custom-modal-content { 
+    position: relative; 
+    width: 90%; 
+    max-width: 1100px; 
+    margin: 40px auto; 
+    background: white; 
+    border-radius: 16px; 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+} 
+@keyframes modalPop { 
+    from { transform: scale(0.9); opacity: 0; } 
+    to { transform: scale(1); opacity: 1; } 
+} 
+.modal-header-custom { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 20px 25px; 
+    border-bottom: 1px solid #eee; 
+} 
+.close-btn { 
+    font-size: 28px; 
+    cursor: pointer; 
+    color: #aaa; 
+    line-height: 1; 
+    transition: color 0.2s; 
+} 
+.close-btn:hover { 
+    color: #000; 
+} 
+.modal-body-custom { 
+    padding: 25px; 
+} 
+.canvas-wrapper { 
+    background: #f8f9fa; 
+    border-radius: 8px; 
+    padding: 10px; 
+    border: 1px dashed #ccc; 
+} 
+#annotationCanvas { 
+    max-width: 100%; 
+    height: auto; 
+    display: block; 
+    margin: 0 auto; 
+    cursor: crosshair; 
+} 
+.coord-label { 
+    position: absolute; 
+    top: 20px; 
+    left: 20px; 
+    background: rgba(0, 0, 0, 0.7); 
+    color: white; 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-family: monospace; 
+    font-size: 12px; 
+    pointer-events: none; 
+} 
+
+/* 标记点样式 */
+.point-marker { 
+    position: absolute; 
+    width: 14px; 
+    height: 14px; 
+    border-radius: 50%; 
+    transform: translate(-50%, -50%); 
+    border: 2px solid white; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); 
+    pointer-events: none; 
+    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+} 
+@keyframes popIn { 
+    from { transform: translate(-50%, -50%) scale(0); } 
+    to { transform: translate(-50%, -50%) scale(1); } 
+} 
+.point-marker.target { 
+    background: #00ff00; 
+} 
+.point-marker.nontarget { 
+    background: #ff0000; 
+} 
+
+/* 已标记帧列表 */
+.marked-frames-box { 
+    background: #f8f9fa; 
+    border: 1px solid #dee2e6; 
+    border-radius: 6px; 
+    padding: 10px; 
+    max-height: 150px; 
+    overflow-y: auto; 
+} 
+.marked-frame-item { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 6px 10px; 
+    background: white; 
+    border-radius: 4px; 
+    margin-bottom: 4px; 
+    border-left: 3px solid var(--primary-color); 
+    font-size: 13px; 
+} 
+
+/* === 8. 左侧步骤导航优化 === */
+.wizard-nav > div {
+    justify-content: flex-end !important; 
+}
+/* 只有当 Prev 按钮显示时 (display 不为 none)，才改为 space-between */
+.wizard-nav #prevBtn:not([style*="display: none"]) ~ #nextBtn {
+    margin-left: auto; 
+}
+.step-card { 
+    height: 100%; 
+    display: flex; 
+    flex-direction: column; 
+} 
+.step-body { 
+    flex: 1; 
+    overflow-y: auto; 
+} 
+.card-body { 
+    display: flex; 
+    flex-direction: column; 
+} 
+#stepContainer { 
+    flex: 1; 
+    min-height: 0; 
+} 
+#emptyPreviewState { 
+    height: 400px; 
+    max-height: 400px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    text-align: center; 
+} 
+
+/* === 9. 通用工具类与动画 === */
+@keyframes slideUp { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+} 
+.icon-btn { 
+    width: 50px; 
+    height: 50px; 
+    padding: 4px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+} 
+.icon-btn img { 
+    width: 42px; 
+    height: 42px; 
+} 
+.btn-icon-only::after { 
+    display: none; 
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 让禁用的输入框看起来不那么“死气沉沉” */
+input[disabled] {
+    background-color: #e9ecef; /* 浅灰背景 */
+    color: #495057;            /* 深色文字，保证可读性 */
+    cursor: not-allowed;       /* 鼠标显示禁止符号 */
+    opacity: 1;                /* 防止透明度降低 */
+}
+.tooltip-inner {
+    max-width: 450px !important;
+    text-align: left;
+    white-space: normal;
+    padding: 15px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    
+    /* 粉色圆角样式 */
+    background-color: #fff0f3;
+    color: #5f2b3a;
+    border-radius: 10px;
+    border: 1px solid #ffcce0;
+    box-shadow: 0 4px 15px rgba(255, 182, 218, 0.4);
+}
+
+
+@font-face {
+    font-family: 'Ruthie';
+    src: url('../assets/fonts/Ruthie-Regular.ttf') format('truetype'); /* 路径可能需要根据你的项目结构调整 */
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* 确保文本在字体加载时不会长时间空白 */
+}
+
+/* 2. 应用字体到步骤编号 */
+.step-number {
+    font-family: 'Ruthie', cursive; /* 使用定义的字体，cursive作为备用 */
+    font-weight: normal; /* Ruthie 通常是单一样式，不需要粗体 */
+    font-style: normal;
+    /* 可选：调整 Ruthie 字体下的视觉效果 */
+    font-size: 2rem;     /* 根据 Ruthie 的字重调整大小 */
+    line-height: 1;      /* Ruthie 通常行高紧凑 */
+}

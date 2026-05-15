@@ -1,0 +1,19 @@
+cat > .gitignore <<EOF
+# 忽略权重和大数据
+checkpoints/
+data/
+*.pth
+*.ckpt
+*.bin
+*.pt
+
+# 忽略算法下的特定大文件夹
+algorithms/Gaussian/submodules/
+
+# 忽略系统和开发环境杂项
+__pycache__/
+*.pyc
+.DS_Store
+.vscode/
+.idea/
+EOF

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SurgiGauss | 内窥镜视频 3D 重建系统</title>
+    <link rel="icon" href="/static/assets/icon/head.ico" type="image/x-icon">
+    <!-- 样式引入 -->
+    <link rel="stylesheet" href="/static/assets/js/bootstrap-5.3.8-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="bg-light">
+    <!-- 顶部导航与标题 -->
+    <header class="container-fluid px-4 py-4 bg-white shadow-sm mb-4">
+        <!-- 导航栏添加 position-fixed 相关类 -->
+        <nav class="navbar navbar-expand-lg bg-body-tertiary position-fixed top-0 start-0 w-100" style="height:80px; z-index: 1030;">
+            <div class="container-fluid">
+                <div class="logo">
+                    <img src="/static/assets/icon/logo.png" alt="SurgiGauss Logo" class="navbar-logo">
+                    <a class="navbar-brand" href="#">SurgiGauss</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+
+                <!-- 右侧导航 -->
+                <nav class="nav nav-pills justify-content-end" id="mainTab" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-reconstruct">重建</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-guide">使用指南</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-blog">Blog</button>
+                    </li>
+                </nav>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 标题内容 -->
+    <div class="card gradient-card" >
+        <div class="card-body">
+            <h5 class="card-title">基于 3D Gaussian 的手术视频三维重建平台</h5>
+            <p class="card-text">利用先进的 3D Gaussian Splatting 技术，将传统的 2D 手术视频转化为保真三维场景，辅助医生进行术前规划与术后复盘。</p>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <main class="container-fluid px-4 pb-5 mt-3" id="main-content">
+        <div class="tab-content" id="mainTabContent">
+            
+            <!-- Tab 1: 重建工作台 -->
+            <div class="tab-pane fade show active" id="tab-reconstruct">
+                <div class="row g-4">
+                    
+                    <!-- 左侧：控制面板 -->
+                    <div class="col-lg-5 col-xl-4 align-self-start">
+                        <div class="card shadow-lg border-0 h-100">
+                        <div class="card-header bg-white py-4">
+                            <h4 class="mb-0 fs-5 fw-bold d-flex align-items-center gap-2">
+                            <i class="bi bi-journal-check"></i>
+                            <span>流程向导</span>
+                            </h4>
+                        </div>
+
+                        <div class="card-body p-4 d-flex flex-column">
+                            
+                            <!-- 步骤内容容器 -->
+                            <div id="stepContainer" class="flex-grow-1">
+                            
+                                <!-- 步骤 1: 数据上传 -->
+                                <div class="step-card" id="step1" data-step="1">
+                                    <div class="step-header d-flex align-items-center mb-3">
+                                    <div class="step-number active">1</div>
+                                    <h5 class="step-title mb-0 ms-2">上传原始数据</h5>
+                                    </div>
+                                    <div class="step-body">
+                                    <select class="form-select form-select-sm mb-3" id="uploadModeSelect">
+                                        <option value="video" selected>📹 单个视频</option>
+                                        <option value="images">🖼️ 图像序列</option>
+                                    </select>
+                                    <div class="mb-3">
+                                        <label for="videoInput" class="form-label text-muted small"><i class="bi bi-file-earmark"></i> 选择文件</label>
+                                        <input class="form-control" type="file" id="videoInput" accept="video/*,.zip">
+                                    </div>
+                                    <button id="uploadBtn" class="btn btn-primary btn-sm w-100">
+                                        <i class="bi bi-cloud-upload"></i> 开始上传
+                                    </button>
+                                    <div class="progress-container mt-3" id="uploadProgressWrapper" style="display:none;">
+                                        <div class="progress" style="height: 4px;">
+                                        <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+                                        </div>
+                                        <small id="uploadStatus" class="text-muted d-block text-center mt-1">等待上传...</small>
+                                    </div>
+                                    </div>
+                                </div>
+                        
+                                <!-- 步骤 2: 掩码处理 -->
+                                <div class="step-card" id="step2" data-step="2" style="display: none;">
+                                    <div class="step-header d-flex align-items-center mb-3">
+                                    <div class="step-number">2</div>
+                                    <h5 class="step-title mb-0 ms-2">✂️ 器械分割</h5>
+                                    </div>
+                                    <div class="step-body">
+                                    <div class="btn-group w-100 mb-3" role="group">
+                                        <input type="radio" class="btn-check" name="maskMode" id="maskExist" value="exist" checked>
+                                        <label class="btn btn-outline-secondary btn-sm" for="maskExist">已有掩码</label>
+                                        <input type="radio" class="btn-check" name="maskMode" id="maskSegment" value="segment">
+                                        <label class="btn btn-outline-secondary btn-sm" for="maskSegment">交互式分割</label>
+                                    </div>
+                                    <div id="maskExistPanel">
+                                        <input class="form-control form-control-sm mb-2" type="file" id="maskZipInput" accept=".zip">
+                                        <button class="btn btn-outline-primary btn-sm w-100" id="uploadMaskZip">📤 上传掩码包</button>
+                                        <!-- 上传进度条展示 -->
+                                        <div class="progress-container mt-3" id="uploadProgressWrapper" style="display:none;">
+                                            <div class="progress" style="height: 4px;">
+                                            <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+                                            </div>
+                                            <small id="uploadStatus" class="text-muted d-block text-center mt-1">等待上传...</small>
+                                        </div>
+                                    </div>
+                                    <div id="maskSegmentPanel" style="display: none;">
+                                        <div class="alert alert-info py-2 mb-2 small">
+                                        <i class="bi bi-mouse"></i> 点击预览图进行标记
+                                        </div>
+                                        <div id="markedFramesContainer" class="marked-frames-box mb-2" style="display:none;">
+                                        <div class="d-flex justify-content-between small mb-1">
+                                            <span>已标记帧</span>
+                                            <span class="badge bg-secondary" id="markedFramesCount">0</span>
+                                        </div>
+                                        <div id="markedFramesList" class="small text-truncate"></div>
+                                        </div>
+                                        <div class="d-grid gap-2">
+                                        <button class="btn btn-warning btn-sm" id="startMarkBtn">
+                                            <i class="bi bi-pin"></i> 开始标记
+                                        </button>
+                                        <button class="btn btn-info btn-sm text-white" id="propagateBtn" style="display: none;">
+                                            <i class="bi bi-arrow-repeat"></i> 生成所有帧
+                                        </button>
+                                        </div>
+                                    </div>
+                                    <div id="maskStatus" class="small text-muted mt-2 text-center"></div>
+                                    </div>
+                                </div>
+                        
+                                <!-- 步骤 3: 深度处理 -->
+                                <div class="step-card" id="step3" data-step="3" style="display: none;">
+                                    <div class="step-header d-flex align-items-center mb-3">
+                                    <div class="step-number">3</div>
+                                    <h5 class="step-title mb-0 ms-2">📏 深度估计</h5>
+                                    </div>
+                                    <div class="step-body">
+                                    <div class="btn-group w-100 mb-3" role="group">
+                                        <input type="radio" class="btn-check" name="depthMode" id="depthExist" value="exist" checked>
+                                        <label class="btn btn-outline-secondary btn-sm" for="depthExist">本地上传</label>
+                                        <input type="radio" class="btn-check" name="depthMode" id="depthEstimate" value="estimate">
+                                        <label class="btn btn-outline-secondary btn-sm" for="depthEstimate">AI 估计</label>
+                                    </div>
+                                    <div id="depthExistPanel">
+                                        <input class="form-control form-control-sm mb-2" type="file" id="depthZipInput" accept=".zip">
+                                        <button class="btn btn-outline-primary btn-sm w-100" id="uploadDepthZip">📤 上传深度包</button>
+                                        <!-- 上传进度条展示 -->
+                                        <div class="progress-container mt-3" id="uploadProgressWrapper" style="display:none;">
+                                            <div class="progress" style="height: 4px;">
+                                            <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+                                            </div>
+                                            <small id="uploadStatus" class="text-muted d-block text-center mt-1">等待上传...</small>
+                                        </div>
+                                    </div>
+                                    <div id="depthEstimatePanel" style="display: none;">
+                                        <button class="btn btn-warning btn-sm w-100" id="DepthEstBtn">
+                                        <i class="bi bi-robot"></i> 启动 AI 模型
+                                        </button>
+                                    </div>
+                                    <div id="depthStatus" class="small text-muted mt-2 text-center"></div>
+                                    </div>
+                                </div>
+                        
+                        <!-- 步骤 4: 重建 -->
+                        <div class="step-card" id="step4" data-step="4" style="display: none;">
+                            <div class="step-header d-flex align-items-center mb-3">
+                                <div class="step-number">4</div>
+                                <h5 class="step-title mb-0 ms-2">🌐 3D 重建</h5>
+                            </div>
+                            <div class="step-body">
+                              
+
+                                <!-- 修改部分：Checkbox Switch -->
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="modifySettingsCheck">
+                                    <label class="form-check-label" for="modifySettingsCheck">
+                                        <i class="bi bi-pencil-square"></i> 修改参数设置
+                                    </label>
+                                </div>
+
+                                <!-- 设置区域：默认显示，但输入框被禁用 -->
+                                <div id="reconstructSettings" class="mb-3 p-3 border rounded bg-light ">
+                                        <!-- 标题和按钮都在同一个 h6 容器内 -->
+                                        <h6 class="mb-3 text-primary border-bottom pb-2 d-flex align-items-center">
+                                            <!-- 图标 -->
+                                            <i class="bi bi-sliders me-2"></i>
+                                            <!-- 文字 -->
+                                            <span>重建参数</span>
+                                            
+                                            <!-- 💡 按钮 -->
+                                            <button type="button" 
+                                                    id="reconstructTooltipBtn" 
+                                                    class="btn btn-sm btn-link text-muted ms-2 p-0" 
+                                                    style="width: 20px; height: 20px; border-radius: 50%; font-size: 14px; line-height: 1; text-decoration: none;"
+                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-placement="right" 
+                                                    data-bs-html="true">
+                                                💡
+                                            </button>
+                                        </h6>
+                        
+
+                                    <!-- 1. coarse_iterations -->
+                                    <div class="coarse_iterations">
+                                        <div class="row mb-3 align-items-center">
+                                            <div class="col-9">
+                                                <label for="coarseIterations" class="form-label fw-bold mb-0 text-end">粗训练迭代次数</label>
+                                            </div>
+                                            <div class="col-3">
+                                                <input type="number" class="form-control" id="coarseIterations" value="1000" min="500" max="3000" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+
+                                    <!-- 2. iterations -->
+                                    <div class="row mb-3 align-items-center">
+                                        <div class="col-9">
+                                            <label for="iterations" class="form-label fw-bold mb-0 text-end">总训练迭代次数</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="number" class="form-control" id="iterations" value="3000" min="2000" max="60000" disabled>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. percent_dense -->
+                                    <div class="row mb-3 align-items-center">
+                                        <div class="col-9">
+                                            <label for="percentDense" class="form-label fw-bold mb-0 text-end">稠密化阈值比例</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="number" class="form-control" id="percentDense" value="0.01" min="0.01" max="0.02" step="0.001" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="progress-container" id="reconstructProgressWrapper" style="display: none;">
+                                    <div class="progress" style="height: 6px;">
+                                        <div id="reconstructProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-danger" style="width: 0%"></div>
+                                    </div>
+                                    <small id="reconstructStatus" class="text-muted d-block mt-1 text-center">初始化中...</small>
+                                </div>
+
+                                <!-- 主要操作按钮 -->
+                                <button id="reconstructBtn" class="btn btn-danger w-100 mb-3">
+                                    <i class="bi bi-gear-fill"></i> 🚀 开始重建计算
+                                </button>
+                            </div>
+                        </div>
+                    
+                            </div>
+                    
+                            <!-- 统一的导航按钮 (固定在底部) -->
+                            <div class="wizard-nav mt-4 pt-3 border-top">
+                                <div class="d-flex justify-content-between gap-2">
+                                    <button id="prevBtn" class="btn btn-outline-secondary btn-sm" style="display: none;">← 上一步</button>
+                                    <button id="nextBtn" class="btn btn-outline-primary btn-sm">下一步 → </button>
+                                </div>
+                            </div>
+                    
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：预览区域 -->
+                    <div class="col-lg-7 col-xl-8">
+                         <!-- 预览切换 Tabs -->
+                         <div class="preview-tabs mb-3">
+                            <button class="preview-tab active" id="switch_rgb_btn">RGB 图像</button>
+                            <button class="preview-tab" id="switch_mask_btn">掩码图</button>
+                            <button class="preview-tab" id="switch_depth_btn">深度图</button>
+                            <button class="preview-tab" id="switch_pointcloud_btn">3D 点云</button>
+                        </div>
+                        <!-- 显示区域 -->
+                        <div id="previewContainer" class="preview-wrapper overflow-auto" style="display: none;">        
+                            <!-- 图像流容器 -->
+                            <div id="imageStream" class="media-stream active"></div>
+                        
+                            <!-- 点云容器 -->
+                            <div id="pointCloudStream" class="media-stream">
+                                <!-- 交互功能区 -->
+                                <div class="preview-controls-container">
+                                    <!-- 功能区主按钮组 -->
+                                    <div class="btn-group me-2" role="group" aria-label="First group">
+                                        <!-- 1. 增加 class="icon-btn" -->
+                                        <button class="btn btn-sm btn-outline-secondary icon-btn" id="enscale_pointcloud_btn"title="放大">
+                                            <img src="/static/assets/icon/+.png" alt="放大">
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary icon-btn" id="descale_pointcloud_btn" title="缩小">
+                                            <img src="/static/assets/icon/-.png" alt="缩小">
+                                        </button>
+                                        
+                                        <!-- ③ 背景设置 -->
+                                        <div class="btn-group" role="group">
+                                            <!-- 2. 下拉按钮也增加 icon-btn 和 btn-icon-only 类 -->
+                                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle icon-btn btn-icon-only" id="bgSetBtn" data-bs-toggle="dropdown" aria-expanded="false" title="背景设置">
+                                                <img src="/static/assets/icon/BG.png" alt="背景设置">
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end p-2">
+                                                <label class="small mb-1 d-block">渐变起点</label>
+                                                <input type="color" id="bgColorStart" value="#ffffff" class="form-control-color mb-2">
+                                                <label class="small mb-1 d-block">渐变终点</label>
+                                                <input type="color" id="bgColorEnd" value="#5A96C8" class="form-control-color mb-2">
+                                                <div class="text-center">
+                                                    <button class="btn btn-xs btn-outline-success btn-sm" id="bgTransparent">透明背景</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- ④ 网格设置 -->
+                                        <button class="btn btn-sm btn-outline-secondary icon-btn" id="gridToggleBtn" title="网格设置">
+                                            <img src="/static/assets/icon/grid.png" alt="网格设置">
+                                        </button>
+                                        
+                                        <button class="btn btn-sm btn-outline-secondary icon-btn" id="downloadFramesBtn" title="下载所有帧">
+                                            <img src="/static/assets/icon/download.png" alt="下载">
+                                        </button>
+                                        
+                                        <button class="btn btn-sm btn-outline-secondary icon-btn" id="resetScaleBtn" title="重置大小">
+                                            <img src="/static/assets/icon/reset.png" alt="重置">
+                                        </button>
+                                    </div>
+                                    <div class="frame-control">
+                                        <button class="btn btn-sm icon-btn no-border-btn" id="pre_FrameBtn" title="上一帧">
+                                            <img src="/static/assets/icon/←.png">
+                                        </button>
+                                    
+                                        <div class="frame-info">
+                                            <span id="currentFrame" class="text-primary fw-bold frame-number">0</span>/
+                                            <span id="totalFrames" class="frame-number">0</span>
+                                        </div>
+                                    
+                                        <button class="btn btn-sm icon-btn no-border-btn" id="next_FrameBtn" title="下一帧">
+                                            <img src="/static/assets/icon/→.png">
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 点云显示 -->
+                                <div id="pointCloudViewer"></div>
+                                
+                                <!-- 悬浮指标卡片 (右下角透明版) -->
+                                <div id="floatingMetrics" class="position-absolute end-0 bg-transparent p-0 m-3" 
+                                style="display: none; z-index: 1050; bottom: 40px; right: 30px; font-family: 'Courier New', monospace;">
+
+                                <!-- 使用 table 标签可以完美实现 "SSIM: 0.9876" 这种紧凑的键值对排列 -->
+                                <table class="text-end" style="font-size: 0.85em; line-height: 1.8;">
+                                <tr>
+                                    <td class="text-muted pe-2" style="border-right: 1px dashed rgba(255,255,255,0.3); vertical-align: top;">SSIM</td>
+                                    <td class="fw-bold text-primary ps-2" style="min-width: 80px;"><span id="val-ssim">-</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted pe-2" style="border-right: 1px dashed rgba(255,255,255,0.3); vertical-align: top;">PSNR</td>
+                                    <td class="fw-bold text-success ps-2" style="min-width: 80px;"><span id="val-psnr">-</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted pe-2" style="border-right: 1px dashed rgba(255,255,255,0.3); vertical-align: top;">LPIPS</td>
+                                    <td class="fw-bold text-danger ps-2" style="min-width: 80px;"><span id="val-lpips">-</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted pe-2" style="border-right: 1px dashed rgba(255,255,255,0.3); vertical-align: top;">FLIP</td>
+                                    <td class="fw-bold text-warning ps-2" style="min-width: 80px;"><span id="val-flip">-</span></td>
+                                </tr>
+                                </table>
+
+                                </div>
+
+                            <!-- 圆形加载条 (默认隐藏) -->
+                            <div id="pointCloudLoader" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+                                <div style="position: relative; width: 60px; height: 60px;">
+                                    
+                                    <!-- 1. 背景圆环 (灰色底) -->
+                                    <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background: #e0e0e0;"></div>
+                                    
+                                    <!-- 2. 进度圆环 (蓝色，动态更新) -->
+                                    <!-- 关键：ID 为 progressRing，初始背景由 JS 控制 -->
+                                    <div id="progressRing" 
+                                        style="position: absolute; width: 100%; height: 100%; border-radius: 50%; 
+                                                background: conic-gradient(#0d6efd 0%, #e0e0e0 0%); 
+                                                transition: background 0.3s ease-out;">
+                                    </div>
+                                    
+                                    <!-- 3. 内部遮罩 (制造空心圆环效果，露出白色背景) -->
+                                    <div style="position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border-radius: 50%; background: #ffffff;"></div>
+                                    
+                                </div>
+
+                                <!-- 下方文字 -->
+                                <div id="loaderText" style="margin-top: 12px; font-size: 14px; color: #333; font-weight: bold; text-align: center;">
+                                    正在加载点云数据... 0%
+                                </div>
+                            </div>
+                                
+                                <!-- 点云播放 -->
+                                <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+                                    <button class="btn btn-sm btn-outline-primary" id="play_PointCloudBtn">⏯️ 播放/暂停</button>
+                                    <button class="btn btn-sm btn-outline-primary" id="de_PlaySpeedBtn">⏪</button>
+                                    <button class="btn btn-sm btn-outline-primary" id="en_PlaySpeedBtn">⏩</button>
+                                    
+                                    <span class="mx-2">|</span>
+
+                                    <span class="d-flex align-items-center" style="font-size: 0.875rem; white-space: nowrap;">
+                                        <img src="/static/assets/icon/v.png" alt="速度" style="height: 20px; width: auto; margin-right: 4px;">
+                                        <span id="playbackSpeed" class="text-primary fw-bold">1.0</span>
+                                    </span>
+                                </div> 
+                            </div>
+                        </div>
+
+                        <!-- 空状态提示 -->
+                        <div id="emptyPreviewState" style="display: block;" class="text-center py-5 mt-5">
+                            <div class="display-1 text-muted opacity-25">👁️</div>
+                            <h5 class="text-muted">预览区域</h5>
+                            <p class="text-muted small">处理完成后将在此处显示实时结果</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2 & 3: 占位内容 -->
+            <div class="tab-pane fade" id="tab-guide">
+                <div class="card border-0 shadow-sm p-5 text-center">
+                    <h3>使用指南</h3>
+                    <p class="text-muted">详细文档加载中...</p>
+                </div>
+            </div>
+
+            <!-- 最新更新加载中 -->
+            <div class="tab-pane fade" id="tab-blog">
+                <div class="card border-0 shadow-sm p-5 text-center">
+                    <h3>Blog</h3>
+                    <p class="text-muted">最新更新加载中...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 交互式分割模态框 -->
+    <div id="segmentationModal" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="modal-header-custom">
+                <h4 class="mb-0">🎨 交互式图像分割</h4>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-primary fs-6">当前帧：<span id="currentFrameIdx">0</span></span>
+                    <span class="close-btn" id="closeSegmentionBtn">&times;</span>
+                </div>
+            </div>
+            
+            <div class="modal-body-custom">
+                <!-- 工具栏 -->
+                <div class="toolbar mb-3 p-2 bg-light rounded d-flex flex-wrap gap-2 align-items-center">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-success btn-sm"  id="modeTargetBtn">✅ 目标点</button>
+                        <button class="btn btn-danger btn-sm"  id="modeNonTargetBtn">❌ 非目标点</button>
+                    </div>
+                    <div class="vr mx-2"></div>
+                    <button class="btn btn-outline-secondary btn-sm" id="undoPointBtn">↩ 撤销</button>
+                    <button class="btn btn-outline-secondary btn-sm" id="clearPointBtn">🗑 清空</button>
+                    <div class="vr mx-2"></div>
+                    <div class="small text-muted">
+                        <span class="text-success fw-bold" id="targetCountDisplay">目标: 0</span>
+                        <span class="ms-2 text-danger fw-bold" id="nontargetCountDisplay">非目标: 0</span>
+                    </div>
+                </div>
+
+                <!-- 操作区 -->
+                <div class="action-area d-flex justify-content-between mb-3">
+                    <div class="btn-group">
+                        <button id="generateCurrentFrameBtn" class="btn btn-warning btn-sm">🎬 生成当前帧</button>
+                        <button id="saveMarkersBtn" class="btn btn-info btn-sm text-white">💾 保存标记</button>
+                    </div>
+                    <button id="finishSegmentationBtn" class="btn btn-primary btn-sm" >完成</button>
+                </div>
+                
+                <!-- 画布区域 -->
+                <div class="canvas-wrapper text-center position-relative">
+                    <div id="coordDisplay" class="coord-label">X: 0, Y: 0</div>
+                    <canvas id="annotationCanvas"></canvas>
+                    <div id="pointMarkers"></div>
+                </div>
+                
+                <div class="mt-3 text-muted small text-center">
+                    <span>💡 左键点击添加标记点 • 绿色=目标 • 红色=非目标</span>
+                    <span>📊 已标记 <span id="totalPointsCount">0</span> 个点</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-white border-top text-center">
+        <div class="container">
+          <span class="text-muted small">© 2026 版权所有 @hxuefeng</span>
+        </div>
+    </footer>
+
+    <!-- 脚本引入 -->
+    <script src="/static/assets/js/jquery-4.0.0.min.js?v=1"></script>
+    <script src="/static/assets/js/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/assets/js/jszip.min.js"></script>
+
+    <!-- 自写逻辑 -->
+    <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>
